@@ -28,8 +28,10 @@ namespace DVC_CODE_SERVER
             }
             name = Encoding.UTF8.GetString(formatted);
             Console.WriteLine("접속 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
-
-            Server.p.Add(this);
+            lock (Server.p)
+            {
+                Server.p.Add(this);
+            }
 
             string tmp = Server.Room_Info_Return();
             Console.WriteLine("방 정보 전송 : " + tmp);

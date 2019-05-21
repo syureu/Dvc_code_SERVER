@@ -29,25 +29,32 @@ namespace DVC_CODE_SERVER
                 Console.WriteLine("현재 접속 원 수 : " + p.Count());
                 Thread.Sleep(1000);
             }
-            t.Join();
+            // t.Join();
         }
 
         public static string Room_Info_Return()
         {
-            string tmp = r.Count().ToString(); // 방 몇개인지 알려줌
-            for (int i = 0; i < r.Count(); i++)
+            string tmp;
+            lock (r)
             {
-                tmp += " " + r[i].room_number + " " + r[i].room_name + " " + r[i].p[0].name + " "
-                    + r[i].p.Count() + " " + r[i].max_people + " " + r[i].isPWRoom().ToString();
-            } // "(방갯수) 방번호 방이름 방장 인원수 최대인원수 비밀번호방여부"
+                tmp = r.Count().ToString(); // 방 몇개인지 알려줌
+                for (int i = 0; i < r.Count(); i++)
+                {
+                    tmp += " " + r[i].room_number + " " + r[i].room_name + " " + r[i].p[0].name + " "
+                        + r[i].p.Count() + " " + r[i].max_people + " " + r[i].isPWRoom().ToString();
+                } // "(방갯수) 방번호 방이름 방장 인원수 최대인원수 비밀번호방여부"
+            }
             return tmp;
         }
 
         public static bool Room_Make_Request(string room_name, Player player, int max_people, bool bool_pw, string room_pw)
         {
             Room room = new Room(room_number_assign++, room_name, player, max_people, bool_pw, room_pw);
-            r.Add(room);
-            player.room = room;
+            lock (r)
+            {
+                r.Add(room);
+                player.room = room;
+            }
             return true;
         }
 
@@ -59,18 +66,21 @@ namespace DVC_CODE_SERVER
              * 2 : 방이 꽉참
              * 3 : 비밀번호 방인데 비번이 틀림
              */
-            for (int i = 0; i < r.Count(); i++)
+            lock (r)
             {
-                if (r[i].room_number == room_number)
+                for (int i = 0; i < r.Count(); i++)
                 {
-                    // 비밀번호 방이면 비밀번호는 맞는가?
-                    if ((r[i].isPWRoom() && r[i].PWcheck(room_pw)) || !r[i].isPWRoom())
+                    if (r[i].room_number == room_number)
                     {
-                        // 방에 자리가 있는가?
-                        if (r[i].max_people <= r[i].p.Count()) return 2;
-                        // 방 번호도 있고, 비번도 맞고, 자리도 있으면 추가
-                        r[i].p.Add(player);
-                        return 0;
+                        // 비밀번호 방이면 비밀번호는 맞는가?
+                        if ((r[i].isPWRoom() && r[i].PWcheck(room_pw)) || !r[i].isPWRoom())
+                        {
+                            // 방에 자리가 있는가?
+                            if (r[i].max_people <= r[i].p.Count()) return 2;
+                            // 방 번호도 있고, 비번도 맞고, 자리도 있으면 추가
+                            r[i].p.Add(player);
+                            return 0;
+                        }
                     }
                 }
             }
@@ -79,16 +89,19 @@ namespace DVC_CODE_SERVER
 
         public static bool Room_Exit_Request(int room_number, Player player)
         {
-            for (int i = 0; i < r.Count(); i++)
+            lock (r)
             {
-                if (r[i].room_number == room_number)
+                for (int i = 0; i < r.Count(); i++)
                 {
-                    for (int j = 0; j < r[j].p.Count(); j++)
+                    if (r[i].room_number == room_number)
                     {
-                        if (r[i].p[j].name == player.name)
+                        for (int j = 0; j < r[j].p.Count(); j++)
                         {
-                            r[i].p.Remove(player);
-                            return true;
+                            if (r[i].p[j].name == player.name)
+                            {
+                                r[i].p.Remove(player);
+                                return true;
+                            }
                         }
                     }
                 }
@@ -98,7 +111,10 @@ namespace DVC_CODE_SERVER
 
         public static void Player_Exit(Player player)
         {
-            p.Remove(player);
+            lock (p)
+            {
+                p.Remove(player);
+            }
         }
     }
 
