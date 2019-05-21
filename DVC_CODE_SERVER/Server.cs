@@ -100,6 +100,7 @@ namespace DVC_CODE_SERVER
                             if (r[i].p[j].name == player.name)
                             {
                                 r[i].p.Remove(player);
+                                if (r[i].p.Count() == 0) r.Remove(r[i]);
                                 return true;
                             }
                         }
@@ -111,10 +112,7 @@ namespace DVC_CODE_SERVER
 
         public static void Player_Exit(Player player)
         {
-            lock (p)
-            {
-                p.Remove(player);
-            }
+            lock (p) p.Remove(player);
         }
     }
 
