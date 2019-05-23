@@ -48,19 +48,27 @@ namespace DVC_CODE_SERVER
             string tmp;
             while (true)
             {
-                int recvCnt = socket.Receive(buffer);
-                if (recvCnt == 0) // 연결 종료로 판단, 플레이어 반환
+                try
+                {
+                    int recvCnt = socket.Receive(buffer);
+                    if (recvCnt == 0) // 연결 종료로 판단, 플레이어 반환
+                    {
+                        Server.Player_Exit(this);
+                        Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
+                        break;
+                    }
+                    tmp = Encoding.UTF8.GetString(buffer);
+                    Message m = (Message)serializer.Deserialize(tmp);
+                    m = m.DoMessage(this);
+                    tmp = serializer.Serialize(m);
+                    buffer = Encoding.UTF8.GetBytes(tmp);
+                    socket.Send(buffer);
+                } catch (SocketException e)
                 {
                     Server.Player_Exit(this);
-                    Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
+                    Console.WriteLine("현재 연결은 원격 호스트에 의해 강제로 끊겼습니다. // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
                     break;
                 }
-                tmp = Encoding.UTF8.GetString(buffer);
-                Message m = (Message) serializer.Deserialize(tmp);
-                m = m.DoMessage(this);
-                tmp = serializer.Serialize(m);
-                buffer = Encoding.UTF8.GetBytes(tmp);
-                socket.Send(buffer);
             }
             socket.Close();
         }
