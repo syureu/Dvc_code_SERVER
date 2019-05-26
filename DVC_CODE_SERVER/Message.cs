@@ -44,10 +44,16 @@ namespace DVC_CODE_SERVER
         public Message DoMessage(Player p)
         {
             Message m = new Message();
+
+            Console.WriteLine(p.name + "유저가 " + flags + "번 명령을 요청하였습니다.");
+
             if(flags==0)
             {
                 m.flags = 1;
                 m.room_info = Server.Room_Info_Return();
+                Console.WriteLine(flags + "번 명령 : 방 정보 요청");
+                Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 정보 답장");
+                Console.WriteLine(m.room_info);
             } else if (flags == 2)
             {
                 room_make_success = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using JsonExSerializer;
+using Newtonsoft.Json;
 using System.Threading;
 
 namespace DVC_CODE_SERVER
@@ -60,7 +61,10 @@ namespace DVC_CODE_SERVER
                     tmp = Encoding.UTF8.GetString(buffer);
                     Message m = (Message)serializer.Deserialize(tmp);
                     m = m.DoMessage(this);
-                    tmp = serializer.Serialize(m);
+                    tmp = JsonConvert.SerializeObject(m);
+
+                    Console.WriteLine(tmp);
+
                     buffer = Encoding.UTF8.GetBytes(tmp);
                     socket.Send(buffer);
                 } catch (SocketException e)
