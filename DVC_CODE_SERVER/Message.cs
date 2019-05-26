@@ -10,22 +10,22 @@ namespace DVC_CODE_SERVER
     class Message
     {
         //for all flags
-        int flags;
+        public int flags;
         //for 1 flags
-        string room_info;
+        public string room_info;
         //for 2 flags
-        string room_name;
-        int max_people;
-        bool bool_pw;
-        string room_pw;
+        public string room_name;
+        public int max_people;
+        public bool bool_pw;
+        public string room_pw;
         //for 3 flags
-        bool room_make_success;
+        public bool room_make_success;
         //for 4 flags
-        int room_number;
+        public int room_number;
         //for 5 flags
-        int room_enter_code;
+        public int room_enter_code;
         //for 6 flags
-        bool room_exit_success;
+        public bool room_exit_success;
 
         /* flags
          * 0 : 방 정보 요청
@@ -56,15 +56,15 @@ namespace DVC_CODE_SERVER
                 Console.WriteLine(m.room_info);
             } else if (flags == 2)
             {
-                room_make_success = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);
+                m.room_make_success = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);
                 m.flags = 3;
             } else if (flags == 4)
             {
-                room_enter_code = Server.Room_Enter_Request(room_number, p, room_pw);
+                m.room_enter_code = Server.Room_Enter_Request(room_number, p, room_pw);
                 m.flags = 5;
             } else if (flags ==6)
             {
-                room_exit_success = Server.Room_Exit_Request(room_number, p);
+                m.room_exit_success = Server.Room_Exit_Request(room_number, p);
                 m.flags = 7;
             }
             return m;

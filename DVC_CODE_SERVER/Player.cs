@@ -46,27 +46,37 @@ namespace DVC_CODE_SERVER
         public void ThreadBody()
         {
             byte[] buffer = new byte[1024];
-            string tmp;
+            string tmp = "";
             while (true)
             {
                 try
                 {
-                    int recvCnt = socket.Receive(buffer);
-                    if (recvCnt == 0) // 연결 종료로 판단, 플레이어 반환
+                    int recvCnt;
+                    while (true)
                     {
-                        Server.Player_Exit(this);
-                        Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
-                        break;
+                        recvCnt = socket.Receive(buffer);
+                        if (recvCnt == 0) // 연결 종료로 판단, 플레이어 반환
+                        {
+                            Server.Player_Exit(this);
+                            Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
+                            break;
+                        }
+                        tmp += Encoding.UTF8.GetString(buffer, 0 , recvCnt);
+                        if (tmp.IndexOf("<EOF>") > -1) break;
                     }
-                    tmp = Encoding.UTF8.GetString(buffer);
+                    Console.WriteLine("" + recvCnt);
+                    Console.WriteLine(tmp);
+
                     Message m = (Message)serializer.Deserialize(tmp);
                     m = m.DoMessage(this);
                     tmp = JsonConvert.SerializeObject(m);
 
                     Console.WriteLine(tmp);
-
+                    
                     buffer = Encoding.UTF8.GetBytes(tmp);
                     socket.Send(buffer);
+                    tmp = null;
+                    tmp = "";
                 } catch (SocketException e)
                 {
                     Server.Player_Exit(this);
