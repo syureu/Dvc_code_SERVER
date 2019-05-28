@@ -59,7 +59,9 @@ namespace DVC_CODE_SERVER
             }
             else if (flags == 2)
             {
-                m.room_make_success = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);
+                m.room_make_success = true;
+                m.room_number = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);
+                m.room_pw = room_pw;
                 m.flags = 3;
                 Console.WriteLine(flags + "번 명령 : 방 개설 요청");
                 Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 개설 답장");
@@ -71,7 +73,7 @@ namespace DVC_CODE_SERVER
                 m.flags = 5;
                 Console.WriteLine(flags + "번 명령 : 방 입장 요청");
                 Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 입장 답장");
-                if(m.room_enter_code==0)
+                if (m.room_enter_code == 0)
                 {
                     Console.WriteLine("입장 성공");
                 }

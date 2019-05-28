@@ -47,15 +47,15 @@ namespace DVC_CODE_SERVER
             return tmp;
         }
 
-        public static bool Room_Make_Request(string room_name, Player player, int max_people, bool bool_pw, string room_pw)
+        public static int Room_Make_Request(string room_name, Player player, int max_people, bool bool_pw, string room_pw)
         {
-            Room room = new Room(room_number_assign++, room_name, player, max_people, bool_pw, room_pw);
+            Room room = new Room(room_number_assign, room_name, player, max_people, bool_pw, room_pw);
             lock (r)
             {
                 r.Add(room);
                 player.room = room;
             }
-            return true;
+            return room_number_assign++;
         }
 
         public static int Room_Enter_Request(int room_number, Player player, string room_pw)
