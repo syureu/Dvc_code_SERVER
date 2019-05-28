@@ -39,6 +39,8 @@ namespace DVC_CODE_SERVER
          * 
          * 6 : 방 퇴장 요청
          * 7 : 방 퇴장 답장
+         * 
+         * 8 : 플레이어 종료 요청
          */
 
         public Message DoMessage(Player p)
@@ -47,25 +49,56 @@ namespace DVC_CODE_SERVER
 
             Console.WriteLine(p.name + "유저가 " + flags + "번 명령을 요청하였습니다.");
 
-            if(flags==0)
+            if (flags == 0)
             {
                 m.flags = 1;
                 m.room_info = Server.Room_Info_Return();
                 Console.WriteLine(flags + "번 명령 : 방 정보 요청");
                 Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 정보 답장");
                 Console.WriteLine(m.room_info);
-            } else if (flags == 2)
+            }
+            else if (flags == 2)
             {
                 m.room_make_success = Server.Room_Make_Request(room_name, p, max_people, bool_pw, room_pw);
                 m.flags = 3;
-            } else if (flags == 4)
+                Console.WriteLine(flags + "번 명령 : 방 개설 요청");
+                Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 개설 답장");
+                Console.WriteLine("성공여부 : " + m.room_make_success);
+            }
+            else if (flags == 4)
             {
                 m.room_enter_code = Server.Room_Enter_Request(room_number, p, room_pw);
                 m.flags = 5;
-            } else if (flags ==6)
+                Console.WriteLine(flags + "번 명령 : 방 입장 요청");
+                Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 입장 답장");
+                if(m.room_enter_code==0)
+                {
+                    Console.WriteLine("입장 성공");
+                }
+                else if (m.room_enter_code == 1)
+                {
+                    Console.WriteLine("방 번호가 없음. 서버 오류거나 방이 폐쇄됨");
+                }
+                else if (m.room_enter_code == 2)
+                {
+                    Console.WriteLine("방 정원 초과로 입장 불가");
+                }
+                else if (m.room_enter_code == 3)
+                {
+                    Console.WriteLine("비밀번호 틀림");
+                }
+            }
+            else if (flags == 6)
             {
                 m.room_exit_success = Server.Room_Exit_Request(room_number, p);
                 m.flags = 7;
+                Console.WriteLine(flags + "번 명령 : 방 퇴장 요청");
+                Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 퇴장 답장");
+                Console.WriteLine("성공여부 : " + m.room_exit_success);
+            }
+            else if (flags == 8)
+            {
+                p.exit_thread = true;
             }
             return m;
         }

@@ -73,7 +73,7 @@ namespace DVC_CODE_SERVER
                     if (r[i].room_number == room_number)
                     {
                         // 비밀번호 방이면 비밀번호는 맞는가?
-                        if ((r[i].isPWRoom() && r[i].PWcheck(room_pw)) || !r[i].isPWRoom())
+                        if (!r[i].isPWRoom() || (r[i].isPWRoom() && r[i].PWcheck(room_pw)))
                         {
                             // 방에 자리가 있는가?
                             if (r[i].max_people <= r[i].p.Count()) return 2;

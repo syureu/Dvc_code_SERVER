@@ -12,6 +12,7 @@ namespace DVC_CODE_SERVER
 {
     class Player
     {
+        public bool exit_thread = false;
         public static Serializer serializer = new Serializer(typeof(Message));
         public Room room;
         public Socket socket;
@@ -47,23 +48,29 @@ namespace DVC_CODE_SERVER
         {
             byte[] buffer = new byte[1024];
             string tmp = "";
+
+            bool exit_flag = false;
+            int recvCnt;
+
             while (true)
             {
                 try
                 {
-                    int recvCnt;
                     while (true)
                     {
                         recvCnt = socket.Receive(buffer);
-                        if (recvCnt == 0) // 연결 종료로 판단, 플레이어 반환
+                        if (recvCnt == 0 || exit_thread) // 연결 종료로 판단, 플레이어 반환
                         {
+                            if (room != null) Server.Room_Exit_Request(room.room_number, this);
                             Server.Player_Exit(this);
                             Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
+                            exit_flag = true;
                             break;
                         }
                         tmp += Encoding.UTF8.GetString(buffer, 0 , recvCnt);
                         if (tmp.IndexOf("<EOF>") > -1) break;
                     }
+                    if (exit_flag) break;
                     Console.WriteLine("" + recvCnt);
                     Console.WriteLine(tmp);
 
@@ -75,10 +82,10 @@ namespace DVC_CODE_SERVER
                     
                     buffer = Encoding.UTF8.GetBytes(tmp);
                     socket.Send(buffer);
-                    tmp = null;
                     tmp = "";
                 } catch (SocketException e)
                 {
+                    if (room != null) Server.Room_Exit_Request(room.room_number, this);
                     Server.Player_Exit(this);
                     Console.WriteLine("현재 연결은 원격 호스트에 의해 강제로 끊겼습니다. // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
                     break;
