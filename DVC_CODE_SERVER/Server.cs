@@ -78,6 +78,8 @@ namespace DVC_CODE_SERVER
                             // 방에 자리가 있는가?
                             if (r[i].max_people <= r[i].p.Count()) return 2;
                             // 방 번호도 있고, 비번도 맞고, 자리도 있으면 추가
+                            r[i].p.Add(player);
+                            player.room = r[i];
                             return 0;
                         }
                         return 3;
