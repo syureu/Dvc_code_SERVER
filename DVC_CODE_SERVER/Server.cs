@@ -27,7 +27,7 @@ namespace DVC_CODE_SERVER
             while (true)
             {
                 Console.WriteLine("현재 접속 원 수 : " + p.Count());
-                Thread.Sleep(1000);
+                Thread.Sleep(3000);
             }
             // t.Join();
         }
@@ -78,36 +78,25 @@ namespace DVC_CODE_SERVER
                             // 방에 자리가 있는가?
                             if (r[i].max_people <= r[i].p.Count()) return 2;
                             // 방 번호도 있고, 비번도 맞고, 자리도 있으면 추가
-                            r[i].p.Add(player);
                             return 0;
                         }
+                        return 3;
                     }
                 }
             }
             return 1;
         }
 
-        public static bool Room_Exit_Request(int room_number, Player player)
+        public static bool Room_Exit_Request(Player player)
         {
             lock (r)
             {
-                for (int i = 0; i < r.Count(); i++)
-                {
-                    if (r[i].room_number == room_number)
-                    {
-                        for (int j = 0; j < r[j].p.Count(); j++)
-                        {
-                            if (r[i].p[j].name == player.name)
-                            {
-                                r[i].p.Remove(player);
-                                if (r[i].p.Count() == 0) r.Remove(r[i]);
-                                return true;
-                            }
-                        }
-                    }
-                }
+                if (player.room == null) return false;
+                player.room.p.Remove(player);
+                if (player.room.p.Count == 0) r.Remove(player.room);
+                player.room = null;
+                return true;
             }
-            return false;
         }
 
         public static void Player_Exit(Player player)

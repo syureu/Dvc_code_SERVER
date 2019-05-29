@@ -92,7 +92,7 @@ namespace DVC_CODE_SERVER
             }
             else if (flags == 6)
             {
-                m.room_exit_success = Server.Room_Exit_Request(room_number, p);
+                m.room_exit_success = Server.Room_Exit_Request(p);
                 m.flags = 7;
                 Console.WriteLine(flags + "번 명령 : 방 퇴장 요청");
                 Console.WriteLine("답장 : " + m.flags + "번 명령 : 방 퇴장 답장");

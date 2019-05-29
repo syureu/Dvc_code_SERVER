@@ -37,7 +37,8 @@ namespace DVC_CODE_SERVER
 
             string tmp = Server.Room_Info_Return();
             Console.WriteLine("방 정보 전송 : " + tmp);
-            buffer = Encoding.UTF8.GetBytes(tmp);
+            buffer = Encoding.UTF8.GetBytes(tmp + "<EOF>");
+            Console.WriteLine(tmp);
             socket.Send(buffer);
 
             Thread t = new Thread(new ThreadStart(ThreadBody));
@@ -61,7 +62,7 @@ namespace DVC_CODE_SERVER
                         recvCnt = socket.Receive(buffer);
                         if (recvCnt == 0 || exit_thread) // 연결 종료로 판단, 플레이어 반환
                         {
-                            if (room != null) Server.Room_Exit_Request(room.room_number, this);
+                            if (room != null) Server.Room_Exit_Request(this);
                             Server.Player_Exit(this);
                             Console.WriteLine("종료 // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
                             exit_flag = true;
@@ -85,7 +86,7 @@ namespace DVC_CODE_SERVER
                     tmp = "";
                 } catch (SocketException e)
                 {
-                    if (room != null) Server.Room_Exit_Request(room.room_number, this);
+                    if (room != null) Server.Room_Exit_Request(this);
                     Server.Player_Exit(this);
                     Console.WriteLine("현재 연결은 원격 호스트에 의해 강제로 끊겼습니다. // 닉네임 : " + name + " IP : " + socket.RemoteEndPoint.ToString());
                     break;
